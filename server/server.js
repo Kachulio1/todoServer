@@ -12,7 +12,21 @@ const PORT = process.env.PORT || 5050;
 
 app.post("/todos", (req, res) => {
   const newTodo = Todo({ text: req.body.text });
-  newTodo.save().then(item => res.send(item), error => res.status(400).send({error: error.message}));
+  newTodo
+    .save()
+    .then(
+      item => res.send(item),
+      error => res.status(400).send({ error: error.message })
+    );
+});
+
+app.get("/todos", async (req, res) => {
+  try {
+    const todos = await Todo.find();
+    res.send({ todos });
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
 });
 
 app.listen(PORT, () => {
