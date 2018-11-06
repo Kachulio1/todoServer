@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { ObjectID } = require("mongodb");
-require('dotenv').config()
+require("dotenv").config();
 let mongoose = require("../db/mongoose");
 let Todo = require("../models/todo");
 let User = require("../models/user");
@@ -52,12 +52,18 @@ app.get("/todos/:id", async (req, res) => {
   }
 });
 
-app.delete('/todos/:id', async (req, res) =>{
-   const id = req.params.id
-   Todo.findByIdAndDelete(id).then(todo => {
-     res.status(200).send({message:'deleted'})
-   })
-})
+app.delete("/todos/:id", async (req, res) => {
+  const id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    res.status(400).send({ type: "InvalidError", error: "Invalid ID" });
+    return;
+  }
+
+  Todo.findByIdAndRemove(id).then(todo => {
+    res.status(200).send({ message: "deleted" });
+  });
+});
 
 app.listen(PORT, () => {
   console.log("Started on port: ", PORT);
