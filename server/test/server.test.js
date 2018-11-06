@@ -18,12 +18,14 @@ const todos = [
   }
 ];
 
-describe("POST /todos", () => {
+describe("POST /todos", function () {
+  this.timeout(0)
   beforeEach(done => {
     Todo.remove({}).then(() => done());
   });
 
   it("should create a todo", done => {
+    
     let text = "test create todo";
     request(app)
       .post("/todos")
@@ -65,7 +67,8 @@ describe("POST /todos", () => {
   });
 });
 
-describe("GET /todos", () => {
+describe("GET /todos", function () {
+  this.timeout(0)
   beforeEach(done => {
     Todo.remove({}).then(() => Todo.insertMany(todos).then(() => done()));
   });
@@ -81,7 +84,8 @@ describe("GET /todos", () => {
   });
 });
 
-describe("GET /todos/:id", () => {
+describe("GET /todos/:id", function() {
+  this.timeout(0)
   beforeEach(done => {
     Todo.remove({}).then(() => Todo.insertMany(todos).then(() => done()));
   });
