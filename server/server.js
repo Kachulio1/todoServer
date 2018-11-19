@@ -35,14 +35,14 @@ app.get("/todos/:id", async (req, res) => {
     const { id } = req.params;
 
     if (!ObjectID.isValid(id)) {
-      res.status(400).send({ type: "InvalidError", error: "Invalid ID" });
+      res.status(404).send({ type: "InvalidError", error: "Invalid ID" });
       return;
     }
 
     const todo = await Todo.findById(id);
 
     if (!todo) {
-      res.send(404).send();
+      res.status(404).send();
       return;
     }
 
@@ -56,11 +56,14 @@ app.delete("/todos/:id", async (req, res) => {
   const id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
-    res.status(400).send({ type: "InvalidError", error: "Invalid ID" });
+    res.status(404).send({error: "Invalid ID" });
     return;
   }
 
   Todo.findByIdAndRemove(id).then(todo => {
+    if (!todo) {
+      return res.status(404).send();
+    }
     res.status(200).send({ todo });
   });
 });

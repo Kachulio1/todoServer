@@ -18,14 +18,13 @@ const todos = [
   }
 ];
 
-describe("POST /todos", function () {
-  this.timeout(0)
+describe("POST /todos", function() {
+  this.timeout(0);
   beforeEach(done => {
     Todo.remove({}).then(() => done());
   });
 
   it("should create a todo", done => {
-    
     let text = "test create todo";
     request(app)
       .post("/todos")
@@ -67,8 +66,8 @@ describe("POST /todos", function () {
   });
 });
 
-describe("GET /todos", function () {
-  this.timeout(0)
+describe("GET /todos", function() {
+  this.timeout(0);
   beforeEach(done => {
     Todo.remove({}).then(() => Todo.insertMany(todos).then(() => done()));
   });
@@ -85,7 +84,7 @@ describe("GET /todos", function () {
 });
 
 describe("GET /todos/:id", function() {
-  this.timeout(0)
+  this.timeout(0);
   beforeEach(done => {
     Todo.remove({}).then(() => Todo.insertMany(todos).then(() => done()));
   });
@@ -112,6 +111,41 @@ describe("GET /todos/:id", function() {
     request(app)
       .get("/todos/invalidID")
       .expect(res => {
+        expect(res.body.error).toBe("Invalid ID");
+      })
+      .end(done);
+  });
+});
+
+describe("DELETE /todos/:id", function() {
+  this.timeout(0);
+
+  beforeEach(done => {
+    Todo.remove({}).then(() => Todo.insertMany(todos).then(() => done()));
+  });
+
+  it("should delete a todo", done => {
+    request(app)
+      .delete(`/todos/${todos[0]._id}`)
+      .expect(res => {
+        expect(res.status).toBe(200);
+        expect(res.body.todo._id).toBe(todos[0]._id.toString());
+      })
+      .end(done);
+  });
+
+  it("should return 404 if todo not found", done => {
+    request(app)
+      .delete(`/todos/${new ObjectID()}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it("should return message error for invalid id", done => {
+    request(app)
+      .delete("/todos/notValidId")
+      .expect(res => {
+        expect(res.status).toBe(404);
         expect(res.body.error).toBe("Invalid ID");
       })
       .end(done);
