@@ -35,7 +35,7 @@ app.get("/todos/:id", async (req, res) => {
     const { id } = req.params;
 
     if (!ObjectID.isValid(id)) {
-      res.status(404).send({ type: "InvalidError", error: "Invalid ID" });
+      res.status(404).send({ error: "Invalid ID" });
       return;
     }
 
@@ -56,7 +56,7 @@ app.delete("/todos/:id", async (req, res) => {
   const id = req.params.id;
 
   if (!ObjectID.isValid(id)) {
-    res.status(404).send({error: "Invalid ID" });
+    res.status(404).send({ error: "Invalid ID" });
     return;
   }
 
@@ -66,6 +66,48 @@ app.delete("/todos/:id", async (req, res) => {
     }
     res.status(200).send({ todo });
   });
+});
+
+app.patch("/todos/:id", (req, res) => {
+  const id = req.params.id;
+  const { completed, text } = req.body;
+  const body = {
+    completed,
+    text
+  };
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send({ error: "Invalid ID" });
+  }
+
+  if (completed && typeof body.completed != "boolean") {
+    return res.status(404).send({
+      error:
+        "completed field must contain `true` or `false` nothing else comprende"
+    });
+  }
+
+  if (body.completed) {
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  if (!body.text) {
+    delete body.text;
+  }
+
+  Todo.findByIdAndUpdate(id, { $set: body }, { new: true })
+    .then(todo => {
+      if (!todo) {
+        return res.status(404).send();
+      }
+      res.send({ todo });
+    })
+    .catch(e => {
+      res.status(400).send();
+    });
 });
 
 app.listen(PORT, () => {
